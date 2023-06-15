@@ -14,5 +14,6 @@ module.exports = {
       },
     },
   },
+  darkMode: 'media', // This enables dark mode based on the prefers-color-scheme media feature
   plugins: [],
 }
