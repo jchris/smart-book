@@ -5,9 +5,10 @@ import { useFireproof } from 'use-fireproof';
 const Sidebar = () => {
   // Define the live query. The query function finds all documents with 'title'.
   // You might need to adjust this based on your actual data structure.
-  const { useLiveQuery } = useFireproof('chagpt-hacks', () => {}, () => {}, {
-    secondary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks' }
-  });
+  const { useLiveQuery } = useFireproof('chagpt-hacks')
+  // , () => {}, () => {}, {
+  //   secondary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks' }
+  // });
 
   // @ts-ignore
   const topics = useLiveQuery(doc => doc.title).docs;
