@@ -1,4 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const withTM = require('next-transpile-modules')(['@fireproof/core', 'use-fireproof']);
 
-module.exports = nextConfig
+module.exports = withTM();
