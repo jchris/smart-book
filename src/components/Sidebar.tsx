@@ -1,10 +1,12 @@
 import Link from 'next/link'
+import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, PromiseLikeOfReactNode } from 'react';
 import { useLiveQuery } from 'use-fireproof';
 
 const Sidebar = () => {
   // Define the live query. The query function finds all documents with 'title'.
   // You might need to adjust this based on your actual data structure.
-  const topics = useLiveQuery(doc => doc.title);
+  // @ts-ignore
+  const topics = useLiveQuery(doc => doc.title).docs;
 
   return (
     <div className="flex flex-col min-h-screen w-64 bg-gray-800 text-white p-5">
@@ -14,9 +16,9 @@ const Sidebar = () => {
 
       <nav className="flex-grow">
         <ul>
-          {topics.map(topic => (
-            <li key={topic.id} className="mb-1">
-              <Link href={`/sections/${topic.id}`} className="text-white hover:text-gray-300">
+          {topics.map((topic: { _id: string; title: string }) => (
+            <li key={topic._id} className="mb-1">
+              <Link href={`/sections/${topic._id}`} className="text-white hover:text-gray-300">
                 {topic.title}
               </Link>
             </li>
