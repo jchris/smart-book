@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, PromiseLikeOfReactNode } from 'react';
-import { useLiveQuery } from 'use-fireproof';
+import { useFireproof } from 'use-fireproof';
 
 const Sidebar = () => {
   // Define the live query. The query function finds all documents with 'title'.
   // You might need to adjust this based on your actual data structure.
+  const { useLiveQuery } = useFireproof('chagpt-hacks');
+
   // @ts-ignore
   const topics = useLiveQuery(doc => doc.title).docs;
 
