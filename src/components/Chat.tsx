@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useFireproof } from 'use-fireproof'
 import {withVectorSearch} from "../helpers"
 
@@ -11,20 +12,21 @@ const Chat = () => {
       secondary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks' }
     }
   )
-console.log(process.env.OPENAI_API_KEY)
+console.log(process.env.NEXT_PUBLIC_OPENAI_API_KEY)
 
   // @ts-ignore
-  const vector = withVectorSearch(database, doc => doc.content, {openAIApiKey : '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'});
+  const vector = withVectorSearch(database, doc => doc.content, {openAIApiKey : process.env.NEXT_PUBLIC_OPENAI_API_KEY});
 
   const [inputValue, setInputValue] = useState('');
+
+    const [results, setResults] = useState<{ doc: any; score: number; }[]>([]);
 
   const handleSendClick = () => {
     const runSearch = async () => {
       const results = await vector.search(inputValue);
-      console.log(results);
+      setResults(results);
     }
 
-    console.log(inputValue);
     runSearch()
     setInputValue('');
   };
@@ -34,9 +36,18 @@ console.log(process.env.OPENAI_API_KEY)
   };
 
   return (
-    <div className="absolute bottom-0 w-full p-4">
+    <div className="fixed bottom-0 w-1/2 p-4 bg-opacity-50 bg-slate-600">
+    <ul>
+        {results.map((result, index) => (
+          <li key={index}>
+            <Link className="text-blue-500 hover:underline" href={`/sections/${result.doc._id}`}>
+            {result.score} {result.doc.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
       <input 
-        className="border p-2 rounded w-full" 
+        className="border p-2 rounded w-full text-black" 
         type="text" 
         value={inputValue} 
         onChange={handleInputChange}

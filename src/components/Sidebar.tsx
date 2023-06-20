@@ -25,7 +25,7 @@ const Sidebar = () => {
         <ul>
           {topics.map((topic: { _id: string; title: string }) => (
             <li key={topic._id} className="mb-1">
-              <Link href={`/sections/${topic._id}`} className="text-white hover:text-gray-300">
+              <Link href={`/sections/${topic._id}`} className="hover:text-orange-400">
                 {topic.title}
               </Link>
             </li>
