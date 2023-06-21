@@ -7,7 +7,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       <div className="w-full flex flex-col">
         <div className="p-4 flex-grow">{children}</div>
-        <Chat/>
+        <Chat />
       </div>
     </div>
   )

@@ -1,11 +1,14 @@
 import { readFile, readdir } from 'fs/promises'
+import { join } from 'path'
 import { Fireproof } from '@fireproof/core/src/fireproof.js'
 
 const db = Fireproof.storage('chagpt-hacks', {
-  primary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks' }
+  primary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks-book' }
 })
 
 console.log('Current directory:', process.cwd())
+
+const BOOK_ID = 'chagpt-hacks'
 
 readdir(process.cwd())
   .then(async files => {
@@ -30,6 +33,8 @@ readdir(process.cwd())
 
           // Create a JSON document
           const jsonHack = {
+            book : BOOK_ID,
+            file: file,
             title: title,
             content: content
           }
@@ -42,5 +47,22 @@ readdir(process.cwd())
         console.error(err)
       }
     }
+  }).then(() => {
+    // upload image files as attachments
+    const imagesDir = join(process.cwd(), 'images')
+    readdir(imagesDir)
+      .then(async files => {
+        const pngs = files.filter(file => file.endsWith('.png'))
+        for (const png of pngs) {
+          const data = await readFile(join(imagesDir, png))
+          console.log(`Storing ${png}`, data.length)
+          const imgDoc = {
+            book : BOOK_ID,
+            name: png.split('/').pop(),
+            img:  'data:image/png;base64,' + data.toString('base64')
+          }
+          await db.put(imgDoc)
+      }
+    })
   })
   .catch(err => console.error('Error reading directory:', err))

@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Link from 'next/link';
-import { useFireproof } from 'use-fireproof'
+import { FireproofCtx } from 'use-fireproof'
 import {withVectorSearch} from "../helpers"
 
 const Chat = () => {
-  const { database } = useFireproof(
-    'chagpt-hacks',
-    () => {},
-    () => {},
-    {
-      secondary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks' }
-    }
-  )
+  const { database } = useContext(FireproofCtx)
+
 console.log(process.env.NEXT_PUBLIC_OPENAI_API_KEY)
 
   // @ts-ignore
