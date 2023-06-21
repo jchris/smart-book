@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps }) {
     },
     async () => {},
     {
-      secondary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks-book' }
+      secondary: { type: 'rest', url: 'http://localhost:8000/chagpt-hacks-book', readonly: true }
     }
   )
   return (
