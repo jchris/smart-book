@@ -40,20 +40,11 @@ const Chat = () => {
     const response = await newMessage(chat, database, vector, inputValue)
     if (conversationID === null) {
       const cnvid = Math.random().toString(36).substring(2)
-      await database.put({
-        conversationID: cnvid,
-        message: response,
-        time: Date.now(),
-        type: 'chat'
-      })
+
+      await database.put({ conversationID: cnvid, ...response })
       setConversationID(cnvid)
     } else {
-      await database.put({
-        conversationID: conversationID,
-        message: response,
-        time: Date.now(),
-        type: 'chat'
-      })
+      await database.put({ conversationID, ...response })
     }
     setInputValue('')
   }
@@ -65,23 +56,12 @@ const Chat = () => {
   console.log('messages', messages)
 
   return (
-    <div className="fixed bottom-0 w-1/2 h-1/3 p-4 bg-opacity-50 bg-slate-600">
-      {/* <ul>
-        {results.map((result, index) => (
-          <li key={index}>
-            <Link className="text-blue-500 hover:underline" href={`/topics/${result.doc._id}`}>
-              {result.score} {result.doc.title}
-            </Link>
-          </li>
+    <div className="fixed bottom-0 w-2/3 h-1/3 p-4 bg-slate-600 flex flex-col">
+      <ul className="overflow-auto flex-grow">
+        {messages.rows.map((message: any) => (
+          <ChatResponse key={message.id} doc={message.doc} />
         ))}
-      </ul> */}
-    <ul>
-      {messages.rows.map((message: any) => (
-        <li key={message._id}>
-          {message.value}
-        </li>
-      ))}
-    </ul>
+      </ul>
       <div className="fixed bottom-0">
         <input
           className="border p-2 rounded w-full text-black"
@@ -123,5 +103,30 @@ async function newMessage(chat: ChatOpenAI, database: Database, vector: any, inp
   console.log('prompt', prompt.length, prompt)
 
   const gptResponse = await chat.call([new HumanChatMessage(prompt)])
-  return gptResponse.text
+  return {
+    type: 'chat',
+    matches: results.map(r => ({ id: r.doc._id, score: r.score, title: r.doc.title })),
+    response: gptResponse.text,
+    prompt: inputValue,
+    time: Date.now()
+  }
+}
+
+function ChatResponse({ doc }) {
+  return (
+    <li className="p-4 mb-4">
+      <p className="text-lg font-bold">{doc.prompt}</p>
+      <p className="text-sm mb-2">{doc.response}</p>
+      <ul className="mt-4">
+        <li className="text-sm mb-1 inline-block">Matching topics:</li>{' '}
+        {doc.matches?.map((match, index, array) => (
+          <li key={match.id} className="text-sm px-1 inline-block">
+            <Link className="text-blue-500 hover:underline" title={`Match: ${Math.floor(match.score * 100)}%`} href={`/topics/${match.id}`}>
+            {match.title}
+            </Link>{index < array.length - 1 ? ',' : ''}
+          </li>
+        ))}
+      </ul>
+    </li>
+  )
 }
