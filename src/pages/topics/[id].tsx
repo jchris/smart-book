@@ -20,12 +20,21 @@ export default function TopicPage() {
   const [html, setHtml] = useState('')
 
   useEffect(() => {
+    async function prepareHTML(doc) {
+      const asciidoctorInstance = asciidoctor()
+      const htmlContent = asciidoctorInstance.convert(doc?.content || '')
+      const newHTML = await replaceImagesWithData(database, htmlContent.toString())
+      setHtml(newHTML)
+      setDoc(doc)
+    }
+
     const updateDoc = async () => {
       await database.ready
       // @ts-ignore
       const doc = await database.get(id).catch(() => ({ title: '', content: '' }))
       // @ts-ignore
-      setDoc(doc)
+
+      prepareHTML(doc)
     }
     console.log('id', id, database?.clock)
 
@@ -33,15 +42,7 @@ export default function TopicPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  useEffect(() => {
-    async function prepareHTML() {
-      const asciidoctorInstance = asciidoctor()
-      const htmlContent = asciidoctorInstance.convert(doc?.content || '')
-      const newHTML = await replaceImagesWithData(database, htmlContent.toString())
-      setHtml(newHTML)
-    }
-    prepareHTML()
-  }, [doc])
+  useEffect(() => {}, [doc])
 
   // console.log('dc', id, htmlContent.constructor.name)
 
@@ -70,7 +71,7 @@ async function replaceImagesWithData(database: Database, htmlContent: string) {
     const name = match[1].split('/').pop()
     const got = await database.index('images').query({ key: [BOOK_ID, name] })
     // console.log('got', name, got.rows[0].doc.img)
-    srcValues.push(got.rows[0].doc.img.toString());
+    srcValues.push(got.rows[0].doc.img.toString())
   }
   let i = 0
   return htmlContent.replace(regex, () => `<img src="${srcValues[i++]}"`)
